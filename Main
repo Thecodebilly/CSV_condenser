@@ -46,7 +46,8 @@ public class Main {
                 for (int i = 3; i < data.length - 1; i++) {
                     int match = 0;
                     beaconNum = i;
-
+                    int done=0;
+                    int j = 0;
                     //if value is filtered, ignore
 
 
@@ -58,7 +59,7 @@ public class Main {
                     }
                     else{
                         //System.out.println("filter is inactive: " + data[i]);
-                        int j = 0;
+
                         while (LLParent.size()>j) {
                                 /*
                                 if (LLParent.get(j).size()==0){
@@ -81,7 +82,7 @@ public class Main {
                         }
 //logic seems sound here ^
 
-                        
+
 
 //check down here v
 
@@ -90,42 +91,26 @@ public class Main {
                             //check if the significant column is populated
 
                             for (int k = 0; k < LLParent.get(j).size(); k++) {
-                                    System.out.println("loop");
-
-                                /*for (String x : LLParent.get(j).get(k))
-                                    {
-                                         System.out.println(x);
-                                    } */
-                                //if it is populated, append new link with link[0]=tempxy[0], and link[1]=tempxy[1], link[significantCol]=significantData;
-                                //errors occur when a column already has a value
-
-                                if (LLParent.get(j).get(k)[beaconNum]!= null) {
-                                    String[] stringo = new String[36];
-                                    stringo[0]=tempxy[0];
-                                    stringo[1]=tempxy[1];
-
-                                    //maybe -1?
-                                    stringo[beaconNum-1] = data[beaconNum];
-                                    //append string to llchild
-                                    LLParent.get(j).add(stringo);
-
-                                    break;
-
-                                    //last link in the new list, with the new data
-                                    //LLParent.get(j).get(LLParent.get(j).size()-1)[0] = tempxy[0];
-                                    //LLParent.get(j).get(LLParent.get(j).size()-1);
-                                }
-
-
-                                //if not populated, populate the array at the significant column with the significant data
-                               
-                                else {
+                                //if there is an open spot in any of the previously made lists... add it!
+                                if (LLParent.get(j).get(k)[beaconNum-1]== null) {
                                     LLParent.get(j).get(k)[beaconNum-1] = data[beaconNum];
-
-
-
+                                    done = 1;
+                                    break;
                                 }
                             }
+
+                            if (done==0) {
+
+
+                                String[] stringo = new String[36];
+
+                                stringo[0] = tempxy[0];
+                                stringo[1] = tempxy[1];
+                                stringo[beaconNum - 1] = data[beaconNum];
+                                //append string to llchild for more room
+                                LLParent.get(j).add(stringo);
+                            }
+
 
                         }
                         //if not a match
