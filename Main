@@ -24,7 +24,7 @@ public class Main {
 
         LinkedList<LinkedList<String[]>> LLParent = new LinkedList<>();
 
-
+        int ID=0;
         try {
             String pathToCsv = "RSSI.csv";
             BufferedReader csvReader = new BufferedReader(new FileReader(pathToCsv));
@@ -67,8 +67,8 @@ public class Main {
                                 } */
 
                                 //System.out.printf("j is :%d \nLLparent size is %d\n",j, LLParent.size());
-                                tempxy[0] = LLParent.get(j).get(0)[0];
-                                tempxy[1] = LLParent.get(j).get(0)[1];
+                                tempxy[0] = LLParent.get(j).get(0)[1];
+                                tempxy[1] = LLParent.get(j).get(0)[2];
 
 
 
@@ -80,11 +80,10 @@ public class Main {
 
                             j++;
                         }
-//logic seems sound here ^
 
 
 
-//check down here v
+
 
                         //if there is a match
                         if (match == 1) {
@@ -92,8 +91,8 @@ public class Main {
 
                             for (int k = 0; k < LLParent.get(j).size(); k++) {
                                 //if there is an open spot in any of the previously made lists... add it!
-                                if (LLParent.get(j).get(k)[beaconNum-1]== null) {
-                                    LLParent.get(j).get(k)[beaconNum-1] = data[beaconNum];
+                                if (LLParent.get(j).get(k)[beaconNum]== null) {
+                                    LLParent.get(j).get(k)[beaconNum] = data[beaconNum];
                                     done = 1;
                                     break;
                                 }
@@ -103,10 +102,11 @@ public class Main {
 
 
                                 String[] stringo = new String[36];
+                                stringo[0] = Integer.toString(ID);
+                                stringo[1] = tempxy[0];
+                                stringo[2] = tempxy[1];
+                                stringo[beaconNum] = data[beaconNum];
 
-                                stringo[0] = tempxy[0];
-                                stringo[1] = tempxy[1];
-                                stringo[beaconNum - 1] = data[beaconNum];
                                 //append string to llchild for more room
                                 LLParent.get(j).add(stringo);
                             }
@@ -119,13 +119,14 @@ public class Main {
                             LinkedList<String[]> list = new LinkedList<>();
                             LLParent.add(list);
                             //generate array that will be first element in the new linked list, populate it
-                            String[] dataRow = new String[36];
-
+                            String[] dataRow = new String[37];
+                            ID++;
                             //System.out.println(xy[0]);
-                            dataRow[0] = xy[0];
-                            dataRow[1] = xy[1];
+                            dataRow[0] = Integer.toString(ID);
+                            dataRow[1] = xy[0];
+                            dataRow[2] = xy[1];
 
-                            dataRow[beaconNum-1] = data[beaconNum];
+                            dataRow[beaconNum] = data[beaconNum];
                             LLParent.getLast().add(dataRow);
 
                             //The corresponding (x,y) pair now has its own linked list, which has one element containing the first iteration of the (x,y) pair
@@ -152,8 +153,25 @@ public class Main {
             System.out.println(LLParent.get(0).get(0)[0]);
             CSVWriter writer = new CSVWriter(new FileWriter("output.csv"));
 
+            //header goes here...
+            //String header = "x,y"
+            //for loop up to 36 that appends ",\"i\"" to the end of the string
+
+
+
             for (LinkedList<String[]> LLchild : LLParent) {
                 for (String[] string : LLchild) {
+                    int n=0;
+
+                    for (String i : string) {
+
+                        if (i!=null) {
+
+                            string[n] = i.replace("\"", "");
+                        }
+                        n++;
+                    }
+
                     writer.writeNext(string);
                 }
 
@@ -199,6 +217,7 @@ if array exists at xy location, insert beacon
 if beacon reading exists, make new array
 if no array, make new array
 */
+
 
 
 
