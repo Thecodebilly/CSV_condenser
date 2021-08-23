@@ -51,7 +51,7 @@ public class Main {
                     //if value is filtered, ignore
 
 
-
+                    //if you want to filter values <|85|, do so in this conditional statement
                     if (data[i].equals("\"-1000\""))
                     {
                         //System.out.println("filter is active: " + data[i]);
@@ -119,13 +119,12 @@ public class Main {
                             LinkedList<String[]> list = new LinkedList<>();
                             LLParent.add(list);
                             //generate array that will be first element in the new linked list, populate it
-                            String[] dataRow = new String[37];
+                            String[] dataRow = new String[36];
                             ID++;
                             //System.out.println(xy[0]);
                             dataRow[0] = Integer.toString(ID);
                             dataRow[1] = xy[0];
                             dataRow[2] = xy[1];
-
                             dataRow[beaconNum] = data[beaconNum];
                             LLParent.getLast().add(dataRow);
 
@@ -160,15 +159,40 @@ public class Main {
 
 
             for (LinkedList<String[]> LLchild : LLParent) {
+
                 for (String[] string : LLchild) {
                     int n=0;
 
+
+
+                    int skipcounter=0;
                     for (String i : string) {
+
+
+
+
+
+                        //skip... check against original dataset
+                        if (skipcounter==1 || skipcounter==2){
+
+
+                        string[n]="nope";
+                        skipcounter++;
+                        continue;
+                    }
+                        skipcounter++;
+
+
 
                         if (i!=null) {
 
                             string[n] = i.replace("\"", "");
+
                         }
+                        else {
+                            string[n] = "-1000";
+                        }
+                        int rssi = Integer.parseInt(string[n]);
                         n++;
                     }
 
@@ -189,22 +213,6 @@ public class Main {
 }
 
 
-/*
-class IOHandler {
-    private String inputFileName;
-    private String outputFileName;
-
-
-
-
-    IOHandler(String input, String output){
-        this.inputFileName = input;
-        this.outputFileName = output;
-
-    }
-}
-*/
-
 
 
 
@@ -217,7 +225,6 @@ if array exists at xy location, insert beacon
 if beacon reading exists, make new array
 if no array, make new array
 */
-
 
 
 
