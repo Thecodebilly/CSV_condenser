@@ -1,5 +1,5 @@
 import com.opencsv.*;
-
+import java.lang.Math;
 
 import java.util.*;
 import java.io.*;
@@ -192,7 +192,10 @@ public class Main {
                         else {
                             string[n] = "-1000";
                         }
-                        int rssi = Integer.parseInt(string[n]);
+                        double rssi = Integer.parseInt(string[n]);
+                        //the man in question
+                        rssi= (-9.315* -Math.log(-rssi))-40.253;
+                        string[n]= Double.toString(rssi);
                         n++;
                     }
 
