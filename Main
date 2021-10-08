@@ -1,12 +1,12 @@
 import com.opencsv.*;
-
+import java.lang.Math;
 
 import java.util.*;
 import java.io.*;
 public class Main {
     public static void main(String[] args) {
 
-
+        int numberofbeacons = 0;
         //command line file grabber
        /*
         if((args.length) != 2){
@@ -42,8 +42,9 @@ public class Main {
 
 
                 int beaconNum;
+                numberofbeacons= data.length-2;
                 //loops through .csv row starting from 4th position
-                for (int i = 3; i < data.length - 1; i++) {
+                for (int i = 3; i < data.length ; i++) {
                     int match = 0;
                     beaconNum = i;
                     int done=0;
@@ -51,7 +52,7 @@ public class Main {
                     //if value is filtered, ignore
 
 
-
+                    //if you want to filter values <|85|, do so in this conditional statement
                     if (data[i].equals("\"-1000\""))
                     {
                         //System.out.println("filter is active: " + data[i]);
@@ -66,9 +67,9 @@ public class Main {
                                     continue;
                                 } */
 
-                                //System.out.printf("j is :%d \nLLparent size is %d\n",j, LLParent.size());
-                                tempxy[0] = LLParent.get(j).get(0)[1];
-                                tempxy[1] = LLParent.get(j).get(0)[2];
+                            //System.out.printf("j is :%d \nLLparent size is %d\n",j, LLParent.size());
+                            tempxy[0] = LLParent.get(j).get(0)[1];
+                            tempxy[1] = LLParent.get(j).get(0)[2];
 
 
 
@@ -91,6 +92,7 @@ public class Main {
 
                             for (int k = 0; k < LLParent.get(j).size(); k++) {
                                 //if there is an open spot in any of the previously made lists... add it!
+
                                 if (LLParent.get(j).get(k)[beaconNum]== null) {
                                     LLParent.get(j).get(k)[beaconNum] = data[beaconNum];
                                     done = 1;
@@ -101,11 +103,12 @@ public class Main {
                             if (done==0) {
 
 
-                                String[] stringo = new String[36];
+                                String[] stringo = new String[data.length];
                                 stringo[0] = Integer.toString(ID);
                                 stringo[1] = tempxy[0];
                                 stringo[2] = tempxy[1];
                                 stringo[beaconNum] = data[beaconNum];
+
 
                                 //append string to llchild for more room
                                 LLParent.get(j).add(stringo);
@@ -119,13 +122,12 @@ public class Main {
                             LinkedList<String[]> list = new LinkedList<>();
                             LLParent.add(list);
                             //generate array that will be first element in the new linked list, populate it
-                            String[] dataRow = new String[37];
+                            String[] dataRow = new String[data.length];
                             ID++;
                             //System.out.println(xy[0]);
                             dataRow[0] = Integer.toString(ID);
                             dataRow[1] = xy[0];
                             dataRow[2] = xy[1];
-
                             dataRow[beaconNum] = data[beaconNum];
                             LLParent.getLast().add(dataRow);
 
@@ -157,22 +159,82 @@ public class Main {
             //String header = "x,y"
             //for loop up to 36 that appends ",\"i\"" to the end of the string
 
+            String header[]= new String[numberofbeacons];
+            header[0]="id ";
+
+            for(int i=1;i<numberofbeacons;i++){
+                header[i]="beacon "+i;
+            }
+
+
+
+            writer.writeNext(header);
+            
 
 
             for (LinkedList<String[]> LLchild : LLParent) {
+
                 for (String[] string : LLchild) {
                     int n=0;
 
+
+
+                    int skipcounter=0;
+
                     for (String i : string) {
+                    //System.out.printf("string:"+ string.length+"\n");
+
+
+
+
+                        //skip... check against original dataset
+                        if (skipcounter==1 || skipcounter==2){
+
+
+                            string[n]="nope";
+                            skipcounter++;
+                            continue;
+                        }
+                        skipcounter++;
+
+
 
                         if (i!=null) {
 
                             string[n] = i.replace("\"", "");
+
+                        }
+                        else {
+                            string[n] = "-1000";
+                        }
+                        double rssi = Integer.parseInt(string[n]);
+                        if (rssi<0 && rssi!=-1000){
+
+                            //the man in question
+                            //  A=-65, n=2
+
+                            //var exp = (-65 - rssi) / (10 * 2);
+                            //rssi = 3.28 * Math.pow(10, exp);
+
+
+                            //christians formula flipped
+                            //rssi= Math.exp((-rssi+40.253)/9.315);
+
+                            string[n] = Double.toString(rssi);
+
                         }
                         n++;
-                    }
 
-                    writer.writeNext(string);
+
+                    }
+                    //fixes the trailing 2 duplicate unread entry problem. 
+                    String PrintString[]=new String[string.length-2];
+                    for (int i=0; i<string.length-2; i++){
+                        PrintString[i]=string[i];
+                    }
+                   
+                    writer.writeNext(PrintString);
+
                 }
 
             }
@@ -189,22 +251,6 @@ public class Main {
 }
 
 
-/*
-class IOHandler {
-    private String inputFileName;
-    private String outputFileName;
-
-
-
-
-    IOHandler(String input, String output){
-        this.inputFileName = input;
-        this.outputFileName = output;
-
-    }
-}
-*/
-
 
 
 
@@ -217,7 +263,5 @@ if array exists at xy location, insert beacon
 if beacon reading exists, make new array
 if no array, make new array
 */
-
-
 
 
